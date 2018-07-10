@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Crosstales.RTVoice;
+//using Crosstales.RTVoice;
 
 public class pilot_speech : MonoBehaviour {
 
@@ -11,7 +11,7 @@ public class pilot_speech : MonoBehaviour {
 
     public void Speak()
     {
-        Speaker.Speak(pilot_action, null, Speaker.VoiceForName(VoiceName));
+        //Speaker.Speak(pilot_action, null, Speaker.VoiceForName(VoiceName));
     }
 
     public string pilot_readback(string pilot_words, string call_sign)

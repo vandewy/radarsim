@@ -8,6 +8,7 @@ public class aircraft : MonoBehaviour {
     public int new_altitude;
     public string call_sign;
     public int heading;
+    public int new_heading;
     public string type;
     public decimal xVelocity;
     public decimal yVelocity;
@@ -15,7 +16,7 @@ public class aircraft : MonoBehaviour {
 	public int climb_rate;
 	public int descent_rate;
 	public int ground_speed;
-    public int turn_rate;
+    public float turn_rate = .40f;
     public bool departure = false;
     public int quadrant;
     public bool radar_contact = false;
@@ -24,4 +25,7 @@ public class aircraft : MonoBehaviour {
     public float blip2_rotation;
     public float blip3_rotation;
 
+    public float rx;
+    public float ry;
+    public float rz;
 }

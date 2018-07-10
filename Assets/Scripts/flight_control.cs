@@ -20,7 +20,7 @@ public class flight_control : MonoBehaviour
     public bool IsDone;
 
     //enables control of gameobject (blip)
-    private Rigidbody2D rb2D;
+    private Rigidbody rb;
     public aircraft blip;
     public database ac_database;
     public GameObject acft;
@@ -30,11 +30,13 @@ public class flight_control : MonoBehaviour
     public Dictionary<string, List<float>> headings;
     public Renderer sector_tag_rend;
 
-    //turn left, turn right, descend, climb threads
-    private Thread lThread;
-    private Thread rThread;
-    private Thread dThread;
-    private Thread cThread;
+    public bool turning = false;
+    public bool left_turn = false;
+    public bool right_turn = false;
+    public int initial_heading; //remove after testing
+
+    public Thread cThread;
+    public Thread dThread;
 
     // Use this for initialization
     void Start()
@@ -43,7 +45,7 @@ public class flight_control : MonoBehaviour
         blip = new aircraft();
         blip.call_sign = this.name.ToString(); //give call sign for db look up during initialization
 
-        rb2D = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody>();
         Vector2 start = transform.position;
         //TESTING
         ac_database = new database();
@@ -58,14 +60,20 @@ public class flight_control : MonoBehaviour
         acft = GameObject.Find(blip.call_sign + "/Canvas/datablock_text");
         c = GameObject.Find(blip.call_sign + "/Canvas");
         sector_tag = GameObject.Find(blip.call_sign + "/Sector_Canvas");
-        initialize_aircraft(blip, headings);
+        //initialize_aircraft(blip, headings);
 
-        blip_fade1 = GameObject.Find(blip.call_sign + "blip/blip_fade1");
-        blip_fade2 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2");
-        blip_fade3 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2/blip_fade3");
+        
 
-		//System.Threading.Thread mThread = new System.Threading.Thread( () => turn_right (blip, headings, 360));
-		//mThread.Start ();
+        //blip_fade1 = GameObject.Find(blip.call_sign + "blip/blip_fade1");
+        //blip_fade2 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2");
+        //blip_fade3 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2/blip_fade3");
+
+        initial_heading = -90; //remove after testing
+        blip.heading = initial_heading;
+        blip.rx = 0;
+        blip.ry = 0;
+        blip.rz = blip.heading;
+        turn_tester();
     }
 
 	public void update_datablock(aircraft ac){
@@ -96,7 +104,7 @@ public class flight_control : MonoBehaviour
 		}
 	}
 
-    public void Update_Sector_Tage()
+    public void Update_Sector_Tag()
     {
         if(sector_tag != null)
         {
@@ -264,463 +272,9 @@ public class flight_control : MonoBehaviour
 
     }
 		
-    public void Move(aircraft ac)
-    {
-        rb2D.AddForce(new Vector2((float)ac.xVelocity, (float)ac.yVelocity));
-        rb2D.velocity = Vector3.ClampMagnitude(rb2D.velocity, .05f);
-		rb2D.MoveRotation (blip.rotation);
-		//coroutine = descend_aircraft(ac);
-		//StartCoroutine (coroutine);
-        //rb2D.MoveRotation(52);
-        
-    }
-
-    public void left_turn_controller(int h)
-    {
-        lThread = new Thread(() => turn_left(blip, headings, h));
-        lThread.Start();
-    }
-
-    public void right_turn_controller(int h)
-    {
-        rThread = new Thread(() => turn_right(blip, headings, h));
-        rThread.Start();
-    }
-
     private void stop_thread(Thread stopThread)
     {
         stopThread.Abort();
-    }
-
-    public void turn_right(aircraft ac, Dictionary<string, List<float>> headings, int heading)
-    {
-        direction_check_right(ac);
-        int count = 0;
-        print("turning");
-        //z is blip.rotation of the blip
-        print("heading " + ac.heading);
-        float degree_turn = Mathf.Abs(ac.heading - (float)heading);
-        decimal final_x = (decimal)headings[heading.ToString()][0];
-        decimal final_y = (decimal)headings[heading.ToString()][1];
-
-        decimal current_x = ac.xVelocity * 1000;
-        decimal current_y = ac.yVelocity * 1000;
-
-
-        bool x_flag = false;
-        bool y_flag = false;
-
-        while (current_x != final_x || current_y != final_y)
-        {
-            count++;
-            Thread.Sleep(50);
-            if (ac.quadrant == 3)
-            {
-                print("quad 3");
-                if (current_x != final_x || x_flag == false)
-                {
-                    current_x -= ac.turn_rate;
-                    ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x || current_x == 0)
-                        x_flag = true;
-                }
-
-                if (y_flag == false || current_y != final_y)
-
-                {
-                    current_y -= ac.turn_rate;
-                    ac.yVelocity = current_y / 1000;
-                    if (current_y == final_y || current_y == -1000)
-                        y_flag = true;
-                }
-
-                ac.rotation -= .085f;
-                degree_turn -= .085f;
-
-                if (x_flag == true && y_flag == true)
-                {
-                    if (current_x == 0 && current_y == -1000)
-                    {
-                        ac.quadrant = 2;
-                        x_flag = false;
-                        y_flag = false;
-                    }
-                }
-            }
-            else if (ac.quadrant == 4)
-            {
-                print("quad 4");
-                if (current_x != final_x || x_flag == false)
-                {
-                    current_x -= ac.turn_rate;
-                    ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x || current_x == 1000)
-                        x_flag = true;
-                }
-
-                if (current_y != final_y || y_flag == false)
-                {
-                    current_y += ac.turn_rate;
-                    ac.yVelocity = current_y / 1000;
-                    if (current_y == final_y || current_y == 0)
-                        y_flag = true;
-                }
-                ac.rotation -= .085f;
-                degree_turn -= .085f;
-
-
-                if (x_flag == true && y_flag == true)
-                {
-                    if (current_x == 1000 && current_y == 0)
-                    {
-                        ac.quadrant = 3;
-                        x_flag = false;
-                        y_flag = false;
-                    }
-                }
-            }
-            else if (ac.quadrant == 1)
-            {
-                print("quad 1");
-                if (current_x != final_x || x_flag == false)
-                {
-                    current_x -= ac.turn_rate;
-                    ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x || current_x == 0)
-                        x_flag = true;
-                }
-
-                if (current_y != final_y || y_flag == false)
-                {
-                    current_y -= ac.turn_rate;
-                    ac.yVelocity = current_y / 1000;
-                    if (current_y == final_y || current_y == 1000)
-                        y_flag = true;
-                }
-                ac.rotation -= .085f;
-                degree_turn -= .085f;
-
-                if (x_flag == true && y_flag == true)
-                {
-                    if (current_x == 0 && current_y == 1000)
-                    {
-                        ac.quadrant = 4;
-                        x_flag = false;
-                        y_flag = false;
-                    }
-                }
-            }
-            else if (ac.quadrant == 2)
-            {
-                print("quad 2");
-                if (current_x != final_x || x_flag == false)
-                {
-                    current_x += ac.turn_rate;
-                    ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x || current_x == -1000)
-                        x_flag = true;
-                }
-
-                if (y_flag == false || current_y != final_y)
-                {
-                    current_y -= ac.turn_rate;
-                    ac.yVelocity = current_y / 1000;
-                    if (current_y == final_y || current_y == 0)
-                        y_flag = true;
-                }
-                ac.rotation -= .085f;
-                degree_turn -= .085f;
-
-
-                if (x_flag == true && y_flag == true)
-                {
-                    if (current_x == -1000 && current_y == 0)
-                    {
-                        ac.quadrant = 1;
-                        x_flag = false;
-                        y_flag = false;
-                    }
-                }
-            }
-
-            if (count > 3000)
-                break;
-
-            //print(ac.rotation);
-
-        }
-        print("x: " + current_x);
-        print("y: " + current_y);
-        ac.xVelocity = final_x / 1000;
-        ac.yVelocity = final_y / 1000;
-        ac.rotation -= degree_turn;
-        ac.heading = heading;
-
-    }
-
-    public void direction_check_right(aircraft ac)
-    {
-        if (ac.xVelocity == 0 && ac.yVelocity == -1)
-            ac.quadrant = 2;
-        else if (ac.xVelocity == 1 && ac.yVelocity == 0)
-            ac.quadrant = 3;
-        else if (ac.xVelocity == 0 && ac.yVelocity == 1)
-            ac.quadrant = 4;
-        else if (ac.xVelocity == -1 && ac.yVelocity == 0)
-            ac.quadrant = 1;
-    }
-
-    public void direction_check_left(aircraft ac)
-    {
-        if (ac.xVelocity == 0 && ac.yVelocity == -1)
-            ac.quadrant = 3;
-        else if (ac.xVelocity == 1 && ac.yVelocity == 0)
-            ac.quadrant = 4;
-        else if (ac.xVelocity == 0 && ac.yVelocity == 1)
-            ac.quadrant = 1;
-        else if (ac.xVelocity == -1 && ac.yVelocity == 0)
-            ac.quadrant = 2;
-    }
-
-    public void turn_left(aircraft ac, Dictionary<string, List<float>> headings, int heading)
-    {
-        direction_check_left(ac);
-
-        float fade_rotation_one = ac.rotation;
-        float fade_rotation_two = ac.rotation;
-        float fade_rotation_three = ac.rotation;
-        int fade_count = 0;
-
-        int count = 0;
-        print("turnin rate" + ac.turn_rate);
-        //z is blip.rotation of the blip
-        print("initial heading " + ac.heading);
-        float degree_turn = Mathf.Abs(ac.heading - (float)heading);
-        decimal final_x = (decimal)headings[heading.ToString()][0];
-        decimal final_y = (decimal)headings[heading.ToString()][1];
-        
-        decimal current_x = ac.xVelocity * 1000;
-        decimal current_y = ac.yVelocity * 1000;
-
-        bool x_flag = false;
-        bool y_flag = false;
-        
-        while(current_x != final_x || current_y != final_y)
-        {
-            count++;
-
-            Thread.Sleep(50);
-            if (ac.quadrant == 3)
-            {
-                print("quad 3");
-                if (current_x != final_x && x_flag == false)
-                {
-                    current_x += ac.turn_rate;
-                    //ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x && current_y != final_y)
-                        current_x += 1;
-                    else if (current_x == 1000 && current_x != final_x)
-                        x_flag = true;
-                    else if (current_x == 1000 && current_x == final_x)
-                        x_flag = true;
-                    else if (current_x == final_x)
-                        x_flag = true;
-                }
-
-                if (y_flag == false && current_y != final_y)
-                {
-                    current_y += ac.turn_rate;
-                    //ac.yVelocity = current_y / 1000;
-                    if (current_y == final_y || current_y == 0)
-                        y_flag = true;
-                }
-
-                ac.xVelocity = current_x / 1000;
-                ac.yVelocity = current_y / 1000;
-                ac.rotation += .085f;
-                degree_turn -= .085f;
-                
-                
-                if (x_flag == true && y_flag == true)
-                {
-                    if(current_x == 1000 && current_y == 0)
-                    {
-                        ac.quadrant = 4;
-                        x_flag = false;
-                        y_flag = false;
-                    }                       
-                }
-
-                print("x: " + current_x);
-                print("y: " + current_y);
-            }else if(ac.quadrant == 4)
-            {
-                print("quad 4");
-                if (current_x != final_x && x_flag == false)
-                {
-                    current_x -= ac.turn_rate;
-                    //ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x && current_y + 1 != final_y)
-                        x_flag = false;
-                    else if (current_x == 0 && current_x == final_x)
-                        x_flag = true;
-                    else if (current_x == 0 && current_x != final_x)
-                        x_flag = true;
-                    else if (current_x == final_x && current_y + 1 == final_y)
-                        x_flag = true;
-                }
-
-                if (current_y != final_y && y_flag == false)
-                {
-                    current_y += ac.turn_rate;
-                    //ac.yVelocity = current_y / 1000;
-                    if (current_y == 1000 && current_y != final_y)
-                        y_flag = true;
-                    else if (current_y == 1000 && current_y == final_y)
-                        y_flag = true;
-                    else if (current_y == final_y)
-                        y_flag = true;
-                }
-
-                ac.xVelocity = current_x / 1000;
-                ac.yVelocity = current_y / 1000;
-                ac.rotation += .085f;
-                degree_turn -= .085f;
-                fade_count += 1;
-                print("fade " + fade_count);
-                if (fade_count >= 20 && fade_count < 50)
-                {
-                    blip.blip1_rotation = ac.rotation - 3f;
-                }else if(fade_count >= 50 && fade_count < 85)
-                {
-                    blip.blip1_rotation = ac.rotation - 3f;
-                    blip.blip2_rotation = ac.rotation - 7f;
-                }else if(fade_count >= 85)
-                {
-                    blip.blip1_rotation = ac.rotation - 3f;
-                    blip.blip2_rotation = ac.rotation - 7f;
-                    blip.blip3_rotation = ac.rotation - 11f;
-                }
-
-                if (x_flag == true && y_flag == true)
-                {
-                    if (current_x == 0 && current_y == 1000)
-                    {
-                        ac.quadrant = 1;
-                        x_flag = false;
-                        y_flag = false;
-                    }
-                    else if (current_x == final_x && current_y == final_y)
-                    {
-                        print("rot " + ac.rotation);
-                        print("final degree turn " + degree_turn);
-                        ac.rotation += degree_turn;
-                    }
-                }
-            }
-            else if(ac.quadrant == 1)
-            {
-                print("quad 1");
-                if (current_x != final_x || x_flag == false)
-                {
-                    current_x -= ac.turn_rate;
-                    ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x && current_y != final_y)
-                        current_x -= 1;
-                    else if (current_x == -1000 && current_x != final_x)
-                        x_flag = true;
-                    else if (current_x == -1000 && current_x == final_x)
-                        x_flag = true;
-                    else if (current_x == final_x)
-                        x_flag = true;
-                }
-
-                if (current_y != final_y || y_flag == false)
-                {
-                    current_y -= ac.turn_rate;
-                    ac.yVelocity = current_y / 1000;
-                    if (current_y == final_y && current_x != final_x)
-                        current_y -= 1;
-                    else if (current_y == 0 && current_y != final_y)
-                        y_flag = true;
-                    else if (current_y == 0 && current_y == final_y)
-                        y_flag = true;
-                    else if (current_y == final_y)
-                        y_flag = true;
-                }
-                ac.rotation += .085f;
-                degree_turn -= .085f;
-
-                if (x_flag == true && y_flag == true)
-                {
-                    if (current_x == -1000 && current_y == 0)
-                    {
-                        ac.quadrant = 2;
-                        x_flag = false;
-                        y_flag = false;
-                    }
-                }
-            }
-            else if(ac.quadrant == 2)
-            {
-                print("quad 2");
-                if (current_x != final_x || x_flag == false)
-                {
-                    current_x += ac.turn_rate;
-                    ac.xVelocity = current_x / 1000;
-                    if (current_x == final_x && current_y != final_y)
-                        current_x += 1;
-                    else if (current_x == 0 && current_x != final_x)
-                        x_flag = true;
-                    else if (current_x == 0 && current_x == final_x)
-                        x_flag = true;
-                    else if (current_x == final_x)
-                        x_flag = true;
-                }
-
-                if (y_flag == false || current_y != final_y)
-                {
-                    current_y -= ac.turn_rate;
-                    ac.yVelocity = current_y / 1000;
-                    if (current_y == final_y && current_x != final_x)
-                        current_y -= 1;
-                    else if (current_y == -1000 && current_y != final_y)
-                        y_flag = true;
-                    else if (current_y == -1000 && current_y == final_y)
-                        y_flag = true;
-                    else if (current_y == final_y)
-                        y_flag = true;
-                }
-                ac.rotation += .085f;
-                degree_turn -= .085f;
-
-
-                if (x_flag == true && y_flag == true)
-                {
-                    if (current_x == 0 && current_y == -1000)
-                    {
-                        ac.quadrant = 3;
-                        x_flag = false;
-                        y_flag = false;
-                    }
-                }
-            }
-
-            if (count > 3000)
-                break;
-            
-            //print(ac.rotation);
-                         
-        }
-        
-        ac.xVelocity = final_x / 1000;
-        ac.yVelocity = final_y / 1000;
-        //ac.rotation += degree_turn;
-        blip.blip1_rotation = ac.rotation;
-        blip.blip2_rotation = ac.rotation;
-        blip.blip3_rotation = ac.rotation;
-        ac.heading = heading;            
-
     }
 
 	public void climb_aircraft(aircraft ac){
@@ -778,26 +332,124 @@ public class flight_control : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        print("x: " + blip.xVelocity);
-        print("y: " + blip.yVelocity);
-        //Move(blip);
-		update_datablock (blip);
-        Update_Sector_Tage();
+        Move();
+		/**update_datablock (blip);
+        Update_Sector_Tag();
         if(blip.radar_contact == false)
         {
             bool oddeven = Mathf.FloorToInt(Time.time) % 2 == 0;
             flash_from_center(oddeven);
-        }
+        }**/
     }
 
+    public void turn_tester()
+    {
+        //right_turn = true;
+        blip.new_heading = 360;
+        left_turn = true;
+        Turn_Controller(blip, get_degree_turn(blip, blip.new_heading, 1));
+    }
+    
+    public void Move()
+    {
+        rb.AddRelativeForce(Vector3.up * .025f);
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, .025f);
+        transform.localEulerAngles = new Vector3(blip.rx, blip.ry, blip.rz);
+    }
+
+    public int normalize_heading(aircraft blip)
+    {
+        int h = blip.heading;
+
+        if (h > 360)
+        {
+            h = h % 360;
+        }
+        else if (h < 0)
+        {
+            h *= -1;
+            if (h > 360)
+            {
+                h = h % 360;
+            }
+        }
+        else if (h == 0 || h == 360)
+        {
+            h = 360;
+        }
+
+        return h;
+    }
+
+    public int get_degree_turn(aircraft blip, int heading, int turn_direction)
+    {
+        int current_heading = normalize_heading(blip);
+        int degree_turn = 0;
+
+        //1 is left turn, 2 is right turn
+        if (turn_direction == 1 && heading < current_heading)
+        {
+            degree_turn = current_heading - heading;
+        }
+        else if (turn_direction == 1)
+        {
+            degree_turn = (360 - heading) + current_heading;
+        }
+
+        if (turn_direction == 2 && heading > current_heading)
+        {
+            degree_turn = heading - current_heading;
+        }
+        else if (turn_direction == 2)
+        {
+            degree_turn = (360 - current_heading) + heading;
+        }
+
+        return degree_turn;
+    }
+
+    public void Turn_Controller(aircraft ac, float degree_turn)
+    {
+        System.Threading.Thread mThread = new System.Threading.Thread(() => Turn(ac, degree_turn));
+        mThread.Start();
+    }
+
+    public void Turn(aircraft ac, float degree_turn)
+    {
+        float target = 0;
+
+        if (left_turn == true)
+        {
+            turning = true;
+            while (target < degree_turn)
+            {
+                System.Threading.Thread.Sleep(80);
+                ac.rz += ac.turn_rate;
+                target += ac.turn_rate;
+            }
+            left_turn = false;
+            turning = false;
+        }
+        else if (right_turn == true)
+        {
+            turning = true;
+            print(target);
+            print(degree_turn);
+            while (target < degree_turn)
+            {
+                System.Threading.Thread.Sleep(80);
+                ac.rz -= ac.turn_rate;
+                target += ac.turn_rate;
+            }
+            right_turn = false;
+            turning = false;
+        }
+    }
     void FixedUpdate()
     {
-        rb2D.AddForce(new Vector3((float)blip.xVelocity, (float)blip.yVelocity, 0));
-        rb2D.velocity = Vector3.ClampMagnitude(rb2D.velocity, .03f);
-        rb2D.MoveRotation(blip.rotation);
-        blip_fade1.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip1_rotation));
-        blip_fade2.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip2_rotation));
-        blip_fade3.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip3_rotation));
+        //blip_fade1.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip1_rotation));
+        //blip_fade2.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip2_rotation));
+        //blip_fade3.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip3_rotation));
     }
 
     public void flash_from_center(bool oddeven)

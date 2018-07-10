@@ -118,11 +118,11 @@ public class Recognition : MonoBehaviour {
             {
                 if (parser.turn_direction == 1)
                 {
-                    GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().left_turn_controller(turn);
+                    //GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().left_turn_controller(turn);
                 }
                 else if (parser.turn_direction == 2)
                 {
-                    GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().right_turn_controller(turn);
+                    //GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().right_turn_controller(turn);
                 }
             }
         }
