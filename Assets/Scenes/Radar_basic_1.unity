@@ -722,17 +722,14 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 1156350243265926, guid: 215be472d3abda649b4d5ff5866725ba, type: 2}
+    - target: {fileID: 1213936260052808, guid: 215be472d3abda649b4d5ff5866725ba, type: 2}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1856040413586390, guid: 215be472d3abda649b4d5ff5866725ba, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1804732722964758, guid: 215be472d3abda649b4d5ff5866725ba, type: 2}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 224589162507869438, guid: 215be472d3abda649b4d5ff5866725ba,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 215be472d3abda649b4d5ff5866725ba, type: 2}
@@ -1193,7 +1190,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1881205819}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8407ff1f1410a894f9cec3a04f254bf9, type: 3}
   m_Name: 
@@ -1309,7 +1306,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1881205819}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14e1e9645158ef0428cadab6cf62a715, type: 3}
   m_Name: 

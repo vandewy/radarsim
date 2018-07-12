@@ -15,6 +15,7 @@ public class Recognition : MonoBehaviour {
     public GameObject update_aircraft;
     public pilot_speech pilot;
     public flight_control control;
+    public aircraft ac;
     //public string[] keywords = new String[] { "up", "down", "left", "right" };
     //public string[] keys = new string[] { "descend", "four thousand", "Pace her two three" };
     public string words;
@@ -37,6 +38,7 @@ public class Recognition : MonoBehaviour {
     void Start() {
         keywords = new Dictionary<string, System.Action>();
 
+        ac = gameObject.GetComponent<aircraft>();
         pilot = new pilot_speech();
         //get call signs to add in front of phraseology
         db = new database();
@@ -110,15 +112,15 @@ public class Recognition : MonoBehaviour {
 
         
         if (heading_key != "empty" && phonetic_ac_callsigns[cs_key] != null){
-            print("here");
+            
             print(parser.heading[heading_key]);
             int turn = Int32.Parse(parser.heading[heading_key]);
-            print(turn);
+            
             if (turn > 0)
             {
                 if (parser.turn_direction == 1)
                 {
-                    //GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().left_turn_controller(turn);
+                    GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().Turn_Controller(ac, control.get_degree_turn(ac, ac.new_heading, 1));
                 }
                 else if (parser.turn_direction == 2)
                 {

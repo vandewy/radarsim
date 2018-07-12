@@ -54,26 +54,26 @@ public class flight_control : MonoBehaviour
 		//xy used for determining force applied when spawned
         xVal = start.x;
         yVal = start.y;
-        degree_turn = 20;
+        degree_turn = 0;
         degree_count = .0f;
         
         acft = GameObject.Find(blip.call_sign + "/Canvas/datablock_text");
         c = GameObject.Find(blip.call_sign + "/Canvas");
         sector_tag = GameObject.Find(blip.call_sign + "/Sector_Canvas");
-        //initialize_aircraft(blip, headings);
+        initialize_aircraft(blip, headings);
 
         
 
-        //blip_fade1 = GameObject.Find(blip.call_sign + "blip/blip_fade1");
-        //blip_fade2 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2");
-        //blip_fade3 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2/blip_fade3");
+        blip_fade1 = GameObject.Find(blip.call_sign + "blip/blip_fade1");
+        blip_fade2 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2");
+        blip_fade3 = GameObject.Find(blip.call_sign + "blip/blip_fade1/blip_fade2/blip_fade3");
 
-        initial_heading = -90; //remove after testing
-        blip.heading = initial_heading;
-        blip.rx = 0;
-        blip.ry = 0;
-        blip.rz = blip.heading;
-        turn_tester();
+        //initial_heading = -90; //remove after testing
+        //blip.heading = initial_heading;
+        //blip.rx = 0;
+        //blip.ry = 0;
+        //blip.rz = blip.heading;
+        //turn_tester();
     }
 
 	public void update_datablock(aircraft ac){
@@ -160,12 +160,14 @@ public class flight_control : MonoBehaviour
             blip.ground_speed = (int)ac_chars[9];
             blip.type = ac_chars[1].ToString();
             blip.new_altitude = (int)ac_chars[6];
-            blip.rotation = 130f; // (float)ac_chars[12];
-            blip.xVelocity = (decimal)heading["50"][0] / 1000; // (float)ac_chars[3];
-            blip.yVelocity = (decimal)heading["50"][1] / 1000; // (float)ac_chars[4];
-            blip.heading = 50;
-            blip.turn_rate = 1;
-            blip.quadrant = 4;
+            //blip.rotation = 130f; // (float)ac_chars[12];
+            // REMOVE after testing blip.xVelocity = (decimal)heading["50"][0] / 1000; // (float)ac_chars[3];
+            // REMOVE after testing blip.yVelocity = (decimal)heading["50"][1] / 1000; // (float)ac_chars[4];
+            blip.heading = -50;
+            blip.rz = blip.heading;
+            
+            //blip.turn_rate = 1;
+            //blip.quadrant = 4;
 
             blip.blip1_rotation = blip.rotation;
             blip.blip2_rotation = blip.rotation;
@@ -333,13 +335,13 @@ public class flight_control : MonoBehaviour
     void Update()
     {
         Move();
-		/**update_datablock (blip);
+		update_datablock (blip);
         Update_Sector_Tag();
         if(blip.radar_contact == false)
         {
             bool oddeven = Mathf.FloorToInt(Time.time) % 2 == 0;
             flash_from_center(oddeven);
-        }**/
+        }
     }
 
     public void turn_tester()
@@ -347,7 +349,7 @@ public class flight_control : MonoBehaviour
         //right_turn = true;
         blip.new_heading = 360;
         left_turn = true;
-        Turn_Controller(blip, get_degree_turn(blip, blip.new_heading, 1));
+        Turn_Controller(blip, get_degree_turn(blip, blip.new_heading, 1)); //1 is left, 2 is right
     }
     
     public void Move()
@@ -445,11 +447,28 @@ public class flight_control : MonoBehaviour
             turning = false;
         }
     }
+
     void FixedUpdate()
     {
-        //blip_fade1.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip1_rotation));
-        //blip_fade2.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip2_rotation));
-        //blip_fade3.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.blip3_rotation));
+
+        if(left_turn == true)
+        {
+            blip_fade1.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz - 5f));
+            blip_fade2.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz - 7f));
+            blip_fade3.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz - 9f));
+        }
+        else if(right_turn == true)
+        {
+            blip_fade1.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz + 5f));
+            blip_fade2.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz + 7f));
+            blip_fade3.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz + 9f));
+        }
+        else
+        {
+            blip_fade1.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz));
+            blip_fade2.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz));
+            blip_fade3.transform.rotation = Quaternion.Euler(new Vector3(0, 0, blip.rz));
+        }
     }
 
     public void flash_from_center(bool oddeven)

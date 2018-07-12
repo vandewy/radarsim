@@ -16,7 +16,7 @@ public class aircraft : MonoBehaviour {
 	public int climb_rate;
 	public int descent_rate;
 	public int ground_speed;
-    public float turn_rate = .40f;
+    public float turn_rate = .30f;
     public bool departure = false;
     public int quadrant;
     public bool radar_contact = false;
