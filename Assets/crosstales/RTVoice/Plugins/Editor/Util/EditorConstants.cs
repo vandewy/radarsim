@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Crosstales.RTVoice.EditorUtil
+﻿namespace Crosstales.RTVoice.EditorUtil
 {
     /// <summary>Collected constants of very general utility for the asset.</summary>
     public static class EditorConstants
@@ -8,10 +6,8 @@ namespace Crosstales.RTVoice.EditorUtil
 
         #region Constant variables
 
-
         // Keys for the configuration of the asset
         public const string KEY_UPDATE_CHECK = Util.Constants.KEY_PREFIX + "UPDATE_CHECK";
-        public const string KEY_UPDATE_OPEN_UAS = Util.Constants.KEY_PREFIX + "UPDATE_OPEN_UAS";
         public const string KEY_REMINDER_CHECK = Util.Constants.KEY_PREFIX + "REMINDER_CHECK";
         public const string KEY_TELEMETRY = Util.Constants.KEY_PREFIX + "TELEMETRY";
         public const string KEY_PREFAB_AUTOLOAD = Util.Constants.KEY_PREFIX + "PREFAB_AUTOLOAD";
@@ -23,12 +19,14 @@ namespace Crosstales.RTVoice.EditorUtil
         public const string KEY_REMINDER_DATE = Util.Constants.KEY_PREFIX + "REMINDER_DATE";
         public const string KEY_REMINDER_COUNT = Util.Constants.KEY_PREFIX + "REMINDER_COUNT";
 
+        public const string KEY_UNITY_DATE = Util.Constants.KEY_PREFIX + "UNITY_DATE";
+
         public const string KEY_LAUNCH = Util.Constants.KEY_PREFIX + "LAUNCH";
 
         public const string KEY_TELEMETRY_DATE = Util.Constants.KEY_PREFIX + "TELEMETRY_DATE";
 
         // Default values
-        public const string DEFAULT_ASSET_PATH = "/crosstales/RTVoice/";
+        public const string DEFAULT_ASSET_PATH = "/Plugins/crosstales/RTVoice/";
         public const bool DEFAULT_UPDATE_CHECK = true;
         public const bool DEFAULT_UPDATE_OPEN_UAS = false;
         public const bool DEFAULT_REMINDER_CHECK = true;
@@ -70,6 +68,23 @@ namespace Crosstales.RTVoice.EditorUtil
             }
         }
 
+        /// <summary>Returns the ID of the asset in UAS.</summary>
+        /// <returns>The ID of the asset in UAS.</returns>
+        public static string ASSET_ID
+        {
+            get
+            {
+                if (Util.Constants.isPro)
+                {
+                    return "41068";
+                }
+                else
+                {
+                    return "48394";
+                }
+            }
+        }
+
         /// <summary>Returns the UID of the asset.</summary>
         /// <returns>The UID of the asset.</returns>
         public static System.Guid ASSET_UID
@@ -90,4 +105,4 @@ namespace Crosstales.RTVoice.EditorUtil
         #endregion
     }
 }
-// © 2015-2017 crosstales LLC (https://www.crosstales.com)
+// © 2015-2018 crosstales LLC (https://www.crosstales.com)

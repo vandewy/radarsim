@@ -34,7 +34,7 @@ namespace Crosstales.RTVoice.EditorExtension
             {
                 if (script.TextFiles != null && script.TextFiles.Length > 0)
                 {
-                    if (Speaker.isTTSAvailable)
+                    if (Speaker.isTTSAvailable && EditorHelper.isRTVoiceInScene)
                     {
                         GUILayout.Label("Generate Audio Files", EditorStyles.boldLabel);
 
@@ -56,6 +56,7 @@ namespace Crosstales.RTVoice.EditorExtension
                             }
                             GUILayout.EndHorizontal();
 
+                            /*
                             EditorHelper.SeparatorUI();
 
                             GUILayout.Label("Editor", EditorStyles.boldLabel);
@@ -64,6 +65,7 @@ namespace Crosstales.RTVoice.EditorExtension
                             {
                                 refreshAssetDatabase();
                             }
+                            */
                         }
                         else
                         {
@@ -88,7 +90,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
         #endregion
 
-
+        /*
         #region Private methods
 
         private void refreshAssetDatabase()
@@ -100,6 +102,7 @@ namespace Crosstales.RTVoice.EditorExtension
         }
 
         #endregion
+    */
     }
 }
-// © 2017 crosstales LLC (https://www.crosstales.com)
+// © 2017-2018 crosstales LLC (https://www.crosstales.com)

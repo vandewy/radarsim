@@ -1,4 +1,4 @@
-﻿# RT-Voice 2.9.2
+﻿# RT-Voice 2.9.8
 
 Thank you for buying our asset "RT-Voice"! 
 If you have any questions about this asset, send us an email at [rtvoice@crosstales.com](mailto:rtvoice@crosstales.com). 
@@ -29,12 +29,8 @@ Follow this steps to upgrade your version of "RT-Voice":
 
 1. Update "RT-Voice" to the latest version from the "Unity AssetStore"
 2. Inside your project in Unity, go to menu "File" => "New Scene"
-3. Delete the "Assets/crosstales/RTVoice" folder from the Project-view
+3. Delete the "Assets/Plugins/crosstales/RTVoice" folder from the Project-view
 4. Import the latest version from the "Unity AssetStore"
-
-### Important changes since 2.8.0
-* Speaker.cs: order of the arguments switched (volume <=> pitch)
-* LiveSpeaker.cs: order of the arguments switched (volume <=> pitch)
 
 
 
@@ -103,4 +99,4 @@ CH-8002 Zürich
 * [NPC Chat](https://www.assetstore.unity3d.com/#!/content/9723?aid=1011lNGT)
 
 
-`Version: 04.12.2017 16:58`
+`Version: 05.06.2018 11:56`

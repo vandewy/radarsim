@@ -8,14 +8,12 @@ namespace Crosstales.RTVoice.EditorTask
     [InitializeOnLoad]
     public static class UpdateCheck
     {
-
         #region Variables
 
         public const string TEXT_NOT_CHECKED = "Not checked.";
         public const string TEXT_NO_UPDATE = "No update available - you are using the latest version.";
 
-        /// <summary>Update status of the asset.</summary>
-        public static UpdateStatus Status = UpdateStatus.NOT_CHECKED;
+        private static UpdateStatus status = UpdateStatus.NOT_CHECKED;
 
 #if !UNITY_WSA || UNITY_EDITOR
         private static char[] splitChar = new char[] { ';' };
@@ -82,25 +80,25 @@ namespace Crosstales.RTVoice.EditorTask
 
         #region Static methods
 
-        public static void UpdateCheckForEditor(out string result)
+        public static void UpdateCheckForEditor(out string result, out UpdateStatus st)
         {
             string[] data = readData();
 
             updateStatus(data);
 
-            if (Status == UpdateStatus.UPDATE)
+            if (status == UpdateStatus.UPDATE)
             {
                 result = updateTextForEditor(data);
             }
-            else if (Status == UpdateStatus.UPDATE_PRO)
+            else if (status == UpdateStatus.UPDATE_PRO)
             {
                 result = updateProTextForEditor(data);
             }
-            else if (Status == UpdateStatus.UPDATE_VERSION)
+            else if (status == UpdateStatus.UPDATE_VERSION)
             {
                 result = updateVersionTextForEditor(data);
             }
-            else if (Status == UpdateStatus.DEPRECATED)
+            else if (status == UpdateStatus.DEPRECATED)
             {
                 result = deprecatedTextForEditor(data);
             }
@@ -108,6 +106,8 @@ namespace Crosstales.RTVoice.EditorTask
             {
                 result = TEXT_NO_UPDATE;
             }
+            
+            st = status;
         }
 
         #endregion
@@ -122,40 +122,97 @@ namespace Crosstales.RTVoice.EditorTask
 
             updateStatus(data);
 
-            if (Status == UpdateStatus.UPDATE)
+            if (status == UpdateStatus.UPDATE)
             {
-                Debug.LogWarning(updateText(data));
+                int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Update available",
+                updateText(data),
+                "Yes, let's do it!",
+                "Not right now",
+                "Don't check again!");
 
-                if (EditorConfig.UPDATE_OPEN_UAS)
+                if (option == 0)
                 {
                     Application.OpenURL(EditorConstants.ASSET_URL);
+                    //UnityEditorInternal.AssetStore.Open("content/" + EditorConstants.ASSET_ID);
+                }
+                else if (option == 1)
+                {
+                    // do nothing!
+                }
+                else
+                {
+                    EditorConfig.UPDATE_CHECK = false;
+
+                    EditorConfig.Save();
                 }
             }
-            else if (Status == UpdateStatus.UPDATE_PRO)
+            else if (status == UpdateStatus.UPDATE_PRO)
             {
-                Debug.LogWarning(updateProText(data));
+                int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Upgrade needed",
+                updateProText(data),
+                "Yes, let's do it!",
+                "Not right now",
+                "Don't ask again!");
 
-                if (EditorConfig.UPDATE_OPEN_UAS)
+                if (option == 0)
                 {
                     Application.OpenURL(Util.Constants.ASSET_PRO_URL);
                 }
-            }
-            else if (Status == UpdateStatus.UPDATE_VERSION)
-            {
-                Debug.LogWarning(updateVersionText(data));
-
-                if (EditorConfig.UPDATE_OPEN_UAS)
+                else if (option == 1)
                 {
-                    Application.OpenURL(Util.Constants.ASSET_CT_URL);
+                    // do nothing!
+                }
+                else
+                {
+                    EditorConfig.UPDATE_CHECK = false;
+
+                    EditorConfig.Save();
                 }
             }
-            else if (Status == UpdateStatus.DEPRECATED)
+            else if (status == UpdateStatus.UPDATE_VERSION)
             {
-                Debug.LogWarning(deprecatedText(data));
+                int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Upgrade needed",
+                updateVersionText(data),
+                "Yes, let's do it!",
+                "Not right now",
+                "Don't ask again!");
 
-                if (EditorConfig.UPDATE_OPEN_UAS)
+                if (option == 0)
+                {
+                    Application.OpenURL(EditorConstants.ASSET_URL);
+                }
+                else if (option == 1)
+                {
+                    // do nothing!
+                }
+                else
+                {
+                    EditorConfig.UPDATE_CHECK = false;
+
+                    EditorConfig.Save();
+                }
+            }
+            else if (status == UpdateStatus.DEPRECATED)
+            {
+                int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Upgrade needed",
+                deprecatedText(data),
+                "Learn more",
+                "Not right now",
+                "Don't bother me again!");
+
+                if (option == 0)
                 {
                     Application.OpenURL(Util.Constants.ASSET_AUTHOR_URL);
+                }
+                else if (option == 1)
+                {
+                    // do nothing!
+                }
+                else
+                {
+                    EditorConfig.UPDATE_CHECK = false;
+
+                    EditorConfig.Save();
                 }
             }
             else
@@ -171,10 +228,6 @@ namespace Crosstales.RTVoice.EditorTask
 
             if (data != null)
             {
-                sb.Append(Util.Constants.ASSET_NAME);
-                sb.Append(" - update found!");
-                sb.Append(System.Environment.NewLine);
-                sb.Append(System.Environment.NewLine);
                 sb.Append("Your version:\t");
                 sb.Append(Util.Constants.ASSET_VERSION);
                 sb.Append(System.Environment.NewLine);
@@ -182,8 +235,7 @@ namespace Crosstales.RTVoice.EditorTask
                 sb.Append(data[2]);
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
-                sb.AppendLine("Please download the new version from the UAS:");
-                sb.AppendLine(EditorConstants.ASSET_URL);
+                sb.AppendLine("Please download the new version from the Unity AssetStore!");
             }
 
             return sb.ToString();
@@ -199,8 +251,7 @@ namespace Crosstales.RTVoice.EditorTask
                 sb.Append(" is deprecated in favour of the PRO-version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
-                sb.AppendLine("Please consider an upgrade in the UAS:");
-                sb.AppendLine(Util.Constants.ASSET_PRO_URL);
+                sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
             }
 
             return sb.ToString();
@@ -216,8 +267,7 @@ namespace Crosstales.RTVoice.EditorTask
                 sb.Append(" is deprecated in favour of an newer version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
-                sb.AppendLine("Please consider an upgrade in the UAS:");
-                sb.AppendLine(Util.Constants.ASSET_CT_URL);
+                sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
             }
 
             return sb.ToString();
@@ -251,7 +301,7 @@ namespace Crosstales.RTVoice.EditorTask
             {
                 System.Net.ServicePointManager.ServerCertificateValidationCallback = Util.Helper.RemoteCertificateValidationCallback;
 
-                using (System.Net.WebClient client = new Util.CTWebClient())
+                using (System.Net.WebClient client = new Common.Util.CTWebClient())
                 {
                     string content = client.DownloadString(Util.Constants.ASSET_UPDATE_CHECK_URL);
 
@@ -292,23 +342,23 @@ namespace Crosstales.RTVoice.EditorTask
                 {
                     if (buildNumber > Util.Constants.ASSET_BUILD)
                     {
-                        Status = UpdateStatus.UPDATE;
+                        status = UpdateStatus.UPDATE;
                     }
                     else if (buildNumber == -100)
                     {
-                        Status = UpdateStatus.UPDATE_PRO;
+                        status = UpdateStatus.UPDATE_PRO;
                     }
                     else if (buildNumber == -200)
                     {
-                        Status = UpdateStatus.UPDATE_VERSION;
+                        status = UpdateStatus.UPDATE_VERSION;
                     }
                     else if (buildNumber == -900)
                     {
-                        Status = UpdateStatus.DEPRECATED;
+                        status = UpdateStatus.DEPRECATED;
                     }
                     else
                     {
-                        Status = UpdateStatus.NO_UPDATE;
+                        status = UpdateStatus.NO_UPDATE;
                     }
                 }
             }
@@ -329,7 +379,7 @@ namespace Crosstales.RTVoice.EditorTask
                 sb.Append(data[2]);
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
-                sb.AppendLine("Please download the new version from the UAS.");
+                sb.AppendLine("Please download the new version from the Unity AssetStore.");
             }
 
             return sb.ToString();
@@ -345,7 +395,7 @@ namespace Crosstales.RTVoice.EditorTask
                 sb.Append(" is deprecated in favour of the PRO-version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
-                sb.AppendLine("Please consider an upgrade in the UAS.");
+                sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
             }
 
             return sb.ToString();
@@ -361,7 +411,7 @@ namespace Crosstales.RTVoice.EditorTask
                 sb.Append(" is deprecated in favour of an newer version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
-                sb.AppendLine("Please consider an upgrade in the UAS.");
+                sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
             }
 
             return sb.ToString();
@@ -397,4 +447,4 @@ namespace Crosstales.RTVoice.EditorTask
         DEPRECATED
     }
 }
-// © 2016-2017 crosstales LLC (https://www.crosstales.com)
+// © 2016-2018 crosstales LLC (https://www.crosstales.com)

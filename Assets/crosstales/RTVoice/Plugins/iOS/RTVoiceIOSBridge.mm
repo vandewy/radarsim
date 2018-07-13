@@ -1,5 +1,6 @@
-//
+﻿//
 //  RTVoiceIOSBridge.mm
+//  Version 2.8.6
 //
 //  Copyright 2016-2017 www.crosstales.com
 //
@@ -36,9 +37,11 @@ AVSpeechSynthesizer *MySynthesizer;
  * @param volume Volume of the speaker in percent
  */
 - (void)speak: (NSString *)name text:(NSString *)text rate:(float)rate pitch:(float)pitch volume:(float)volume
+//- (void)speak: (NSString *)id text:(NSString *)text rate:(float)rate pitch:(float)pitch volume:(float)volume
 {
 #ifdef DEBUG
     NSLog(@"speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", name, text, rate, pitch, volume);
+    //NSLog(@"speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", id, text, rate, pitch, volume);
 #endif
 
     if (!_synthesizer)
@@ -57,38 +60,37 @@ AVSpeechSynthesizer *MySynthesizer;
         
         for (AVSpeechSynthesisVoice *v in voices) {
             if ([v.name isEqualToString:name])
+            //if ([v.identifier isEqualToString:id])
             {
                 voice = v;
                 break;
             }
         }
 
+#ifdef DEBUG
         NSLog(@"speak - selected voice: %@", voice.name);
-        
+#endif
+
         AVSpeechUtterance *utterance = [[AVSpeechUtterance alloc] initWithString:text];
         utterance.voice = voice;
-        
+
         float adjustedRate = AVSpeechUtteranceDefaultSpeechRate * rate;
         
         if (adjustedRate > AVSpeechUtteranceMaximumSpeechRate)
         {
             adjustedRate = AVSpeechUtteranceMaximumSpeechRate;
         }
-        
+
         if (adjustedRate < AVSpeechUtteranceMinimumSpeechRate)
         {
             adjustedRate = AVSpeechUtteranceMinimumSpeechRate;
         }
-        
+
         utterance.rate = adjustedRate;
         utterance.volume = volume;
-        
-        float pitchMultiplier = pitch;
-        //if ((pitchMultiplier >= 0.5) && (pitchMultiplier <= 2.0))
-        //{
-            utterance.pitchMultiplier = pitchMultiplier;
-        //}
-        
+
+        utterance.pitchMultiplier = pitch;
+
         MySynthesizer = _synthesizer;
         [_synthesizer speakUtterance:utterance];
     } else {
@@ -117,10 +119,16 @@ AVSpeechSynthesizer *MySynthesizer;
     
     NSString *appendstring = @"";
     for (AVSpeechSynthesisVoice *voice in voices) {
+        //appendstring = [appendstring stringByAppendingString:voice.identifier];
+        //appendstring = [appendstring stringByAppendingString:@","];
         appendstring = [appendstring stringByAppendingString:voice.name];
         appendstring = [appendstring stringByAppendingString:@","];
         appendstring = [appendstring stringByAppendingString:voice.language];
         appendstring = [appendstring stringByAppendingString:@","];
+        
+#ifdef DEBUG
+        NSLog(@"Voice-ID: %@ - Name: %@, Language: %@, Quality: %ld", voice.identifier, voice.name, voice.language, (long)voice.quality);
+#endif
     }
     
 #ifdef DEBUG
@@ -204,18 +212,22 @@ extern "C" {
      * @param volume Volume of the speaker in percent
      */
     void Speak(char *name, char *text, float rate, float pitch, float volume)
+    //void Speak(char *id, char *text, float rate, float pitch, float volume)
     {
         if([[[UIDevice currentDevice]systemVersion]floatValue] < 8){
             NSLog(@"ERROR: RT-Voice doesn't support iOS-versions before 8!");
         } else {
             NSString *voiceName = [NSString stringWithUTF8String:name];
+            //NSString *voiceId = [NSString stringWithUTF8String:id];
             NSString *messageFromRTVoice = [NSString stringWithUTF8String:text];
 
 #ifdef DEBUG
             NSLog(@"Speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", voiceName, messageFromRTVoice, rate, pitch, volume);
+            //NSLog(@"Speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", voiceId, messageFromRTVoice, rate, pitch, volume);
 #endif
 
             [[RTVoiceIOSBridge alloc] speak:voiceName text:messageFromRTVoice rate:rate pitch:pitch volume:volume];
+            //[[RTVoiceIOSBridge alloc] speak:voiceId text:messageFromRTVoice rate:rate pitch:pitch volume:volume];
         }
     }
     

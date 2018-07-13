@@ -1511,7 +1511,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 3
-  Dependency: {fileID: 0}
 --- !u!114 &11443760
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2209,7 +2208,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 584ba5e010da8db4d8a6018e134fe2fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CanvasName: Canvas
 --- !u!114 &11489214
 MonoBehaviour:
   m_ObjectHideFlags: 1

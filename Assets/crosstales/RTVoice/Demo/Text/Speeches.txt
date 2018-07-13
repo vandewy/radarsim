@@ -1,9 +1,3 @@
 #Text;Output file (without extension);Voice name;Rate;Pitch;Volume
-#This is a test speech;C:\Users\slaub\Desktop\Speeches\01
-#This is a test speech;C:\Users\slaub\Desktop\Speeches\02;Microsoft Zira Desktop
-#This is a test speech;C:\Users\slaub\Desktop\Speeches\Mary01
-#This is a test speech;C:\Users\slaub\Desktop\Speeches\Mary02;cmu-slt-hsmm
-#This is a test speech;_Speeches\01
-#This is a test speech;_Speeches\02;Microsoft Zira Desktop
-This is a test speech;_Speeches\Mary01
-This is a test speech;_Speeches\Mary02;cmu-slt-hsmm
+Tower one;_Speeches/Tower01;Microsoft David Desktop;0.8;1.8;0.9
+Tower Two;_Speeches/Tower02;Microsoft Zira Desktop;1.25;0.5;0.8
