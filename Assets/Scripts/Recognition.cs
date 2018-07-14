@@ -44,7 +44,6 @@ public class Recognition : MonoBehaviour {
         db = new database();
         // DO not call again db.Build_Lexicon();
         phonetic_ac_callsigns = db.get_phonetic_call_signs();
-
         parser = new parse();  //used for parsing recognized phrases
         parser.create_alt_dictionary();
 
@@ -60,7 +59,6 @@ public class Recognition : MonoBehaviour {
         keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
         keywordRecognizer.OnPhraseRecognized += KeywordRecognizerOnPhraseRecognized;
         keywordRecognizer.Start();
-        print(keywords.Count + " phrases");
 	}
 
     public void Build_Phrases(List<string> lex)
