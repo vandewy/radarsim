@@ -56,7 +56,7 @@ public class flight_control : MonoBehaviour
         yVal = start.y;
         degree_turn = 0;
         degree_count = .0f;
-        
+
         acft = GameObject.Find(blip.call_sign + "/Canvas/datablock_text");
         c = GameObject.Find(blip.call_sign + "/Canvas");
         sector_tag = GameObject.Find(blip.call_sign + "/Sector_Canvas");
@@ -165,6 +165,7 @@ public class flight_control : MonoBehaviour
             // REMOVE after testing blip.yVelocity = (decimal)heading["50"][1] / 1000; // (float)ac_chars[4];
             blip.heading = -50;
             blip.rz = blip.heading;
+            blip.call_sign = gameObject.name;
             
             //blip.turn_rate = 1;
             //blip.quadrant = 4;
@@ -347,9 +348,9 @@ public class flight_control : MonoBehaviour
     public void turn_tester()
     {
         //right_turn = true;
-        blip.new_heading = 360;
-        left_turn = true;
-        Turn_Controller(blip, get_degree_turn(blip, blip.new_heading, 1)); //1 is left, 2 is right
+        //blip.new_heading = 360;
+        //left_turn = true;
+        //Turn_Controller(blip, get_degree_turn(blip, blip.new_heading, 1)); //1 is left, 2 is right
     }
     
     public void Move()
@@ -361,6 +362,7 @@ public class flight_control : MonoBehaviour
 
     public int normalize_heading(aircraft blip)
     {
+        print("norm blip heading  " + blip.heading);
         int h = blip.heading;
 
         if (h > 360)
@@ -387,7 +389,7 @@ public class flight_control : MonoBehaviour
     {
         int current_heading = normalize_heading(blip);
         int degree_turn = 0;
-
+        print("current  " + current_heading);
         //1 is left turn, 2 is right turn
         if (turn_direction == 1 && heading < current_heading)
         {
@@ -419,7 +421,7 @@ public class flight_control : MonoBehaviour
     public void Turn(aircraft ac, float degree_turn)
     {
         float target = 0;
-
+        
         if (left_turn == true)
         {
             turning = true;

@@ -38,8 +38,10 @@ public class Recognition : MonoBehaviour {
     void Start() {
         keywords = new Dictionary<string, System.Action>();
 
-        ac = gameObject.GetComponent<aircraft>();
+        //ac = gameObject.GetComponent<aircraft>();
         pilot = new pilot_speech();
+        control = new flight_control();
+        
         //get call signs to add in front of phraseology
         db = new database();
         // DO not call again db.Build_Lexicon();
@@ -96,6 +98,7 @@ public class Recognition : MonoBehaviour {
 
         
         
+        
         if(alt_key != "empty" && phonetic_ac_callsigns[cs_key] != null && parser.altitude[alt_key] > 0)
         {
             if (parser.elevation_action(phrase_words) == 1)
@@ -111,18 +114,23 @@ public class Recognition : MonoBehaviour {
         
         if (heading_key != "empty" && phonetic_ac_callsigns[cs_key] != null){
             
-            print(parser.heading[heading_key]);
             int turn = Int32.Parse(parser.heading[heading_key]);
             
             if (turn > 0)
             {
-                if (parser.turn_direction == 1)
+                if (parser.turn_direction == 1)  //1 is left turn
                 {
+                    update_aircraft = GameObject.Find("BIGFOOT25");
+                    ac = update_aircraft.GetComponent<aircraft>();
+                    print(ac.call_sign);
+                    GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().left_turn = true;
                     GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().Turn_Controller(ac, control.get_degree_turn(ac, ac.new_heading, 1));
                 }
-                else if (parser.turn_direction == 2)
+                else if (parser.turn_direction == 2) //2 is right turn
                 {
-                    //GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().right_turn_controller(turn);
+                    ac.new_heading = turn;
+                    GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().right_turn = true;
+                    GameObject.Find(phonetic_ac_callsigns[cs_key]).GetComponent<flight_control>().Turn_Controller(ac, control.get_degree_turn(ac, ac.new_heading, 2));
                 }
             }
         }
