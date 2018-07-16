@@ -20,7 +20,7 @@ public class spawn : MonoBehaviour {
     {
         //-5,3  -6.3,-.75   -4f,-4.10   6.2,-4.10   6.5,.35  3.12,3.86  
         //departure .07f,-.83f
-         GameObject clone = GameObject.Instantiate(Aircraft, new Vector2(-4f, -4.10f), Quaternion.identity);
+         GameObject clone = GameObject.Instantiate(Aircraft, new Vector2(3.12f, 3.86f), Quaternion.identity);
          clone.name = ac_call_sign;
     }
 }

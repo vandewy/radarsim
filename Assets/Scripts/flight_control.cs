@@ -127,13 +127,18 @@ public class flight_control : MonoBehaviour
             blip.ground_speed = (int)ac_chars[9];
             blip.type = ac_chars[1].ToString();
             blip.new_altitude = (int)ac_chars[6];
-            blip.rotation = 60f; // (float)ac_chars[12];
-            blip.xVelocity = (decimal)heading["120"][0] / 1000; // (float)ac_chars[3];
-            blip.yVelocity = (decimal)heading["120"][1] / 1000; // (float)ac_chars[4];
-            blip.turn_rate = 1;
-            blip.quadrant = 3;
-            blip.heading = 120;
-            
+            //blip.rotation = 60f; // (float)ac_chars[12];
+            //blip.xVelocity = (decimal)heading["120"][0] / 1000; // (float)ac_chars[3];
+            //blip.yVelocity = (decimal)heading["120"][1] / 1000; // (float)ac_chars[4];
+            //blip.turn_rate = 1;
+            //blip.quadrant = 3;
+            blip.heading = -120;
+            blip.rz = blip.heading;
+            blip.call_sign = gameObject.name;
+
+            blip.blip1_rotation = blip.rotation;
+            blip.blip2_rotation = blip.rotation;
+            blip.blip3_rotation = blip.rotation;
         }
         else if (xVal < -6.0 && yVal < 0 && yVal > -1)
         { //direct from west
@@ -175,7 +180,7 @@ public class flight_control : MonoBehaviour
             blip.blip3_rotation = blip.rotation;
 
         }
-        /*else if (xVal > 6 && yVal < -4 && yVal > -4.5)
+        else if (xVal > 6 && yVal < -4 && yVal > -4.5)
         { //from SE quadrant
             print("SE");
             blip.current_altitude = (int)ac_chars[5] / 100;
@@ -184,18 +189,44 @@ public class flight_control : MonoBehaviour
             blip.ground_speed = (int)ac_chars[9];
             blip.type = ac_chars[1].ToString();
             blip.new_altitude = (int)ac_chars[6];
-            blip.rotation = -120f; // (float)ac_chars[12];
-            blip.xVelocity = heading["300"][0]; // (float)ac_chars[3];
-            blip.yVelocity = heading["300"][1]; // (float)ac_chars[4];
-            blip.heading = (int)ac_chars[2];
-            blip.turn_rate = .017f;
-            GameObject text = GameObject.Find(blip.call_sign + "Canvas/datablock_text");
-            float xt = text.transform.position.x;
-            float yt = text.transform.position.y;
-            text.transform.position = new Vector2(xt+.5f, yt-.5f);
+
+            blip.heading = -300;
+            blip.rz = blip.heading;
+            blip.call_sign = gameObject.name;
+
+            blip.blip1_rotation = blip.rotation;
+            blip.blip2_rotation = blip.rotation;
+            blip.blip3_rotation = blip.rotation;
+            //blip.rotation = -120f; // (float)ac_chars[12];
+            //blip.xVelocity = heading["300"][0]; // (float)ac_chars[3];
+            //blip.yVelocity = heading["300"][1]; // (float)ac_chars[4];
+            //blip.heading = (int)ac_chars[2];
+            //blip.turn_rate = .017f;
+            //GameObject text = GameObject.Find(blip.call_sign + "Canvas/datablock_text");
+            //float xt = text.transform.position.x;
+            //float yt = text.transform.position.y;
+            //text.transform.position = new Vector2(xt+.5f, yt-.5f);
 
         }
-        else if (xVal > 6 && yVal < .45 && yVal > 0)
+        else if(xVal > 3 && xVal < 4 && yVal > 3 && yVal < 4)
+        { //from NE
+            print("NE");
+            blip.current_altitude = (int)ac_chars[5] / 100;
+            blip.descent_rate = (int)ac_chars[11];
+            blip.climb_rate = (int)ac_chars[10];
+            blip.ground_speed = (int)ac_chars[9];
+            blip.type = ac_chars[1].ToString();
+            blip.new_altitude = (int)ac_chars[6];
+
+            blip.heading = -210;
+            blip.rz = blip.heading;
+            blip.call_sign = gameObject.name;
+
+            blip.blip1_rotation = blip.rotation;
+            blip.blip2_rotation = blip.rotation;
+            blip.blip3_rotation = blip.rotation;
+        }
+        /*else if (xVal > 6 && yVal < .45 && yVal > 0)
         { //from East
             print("East");
             blip.current_altitude = (int)ac_chars[5] / 100;
@@ -355,8 +386,8 @@ public class flight_control : MonoBehaviour
     
     public void Move()
     {
-        rb.AddRelativeForce(Vector3.up * .025f);
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity, .025f);
+        rb.AddRelativeForce(Vector3.up * 3.025f);
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, 3.025f);
         transform.localEulerAngles = new Vector3(blip.rx, blip.ry, blip.rz);
     }
 
